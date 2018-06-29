@@ -4,6 +4,7 @@ package mma.example.com.mapboxfragnav;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,9 +12,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEngineListener;
@@ -33,6 +37,8 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin;
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
+import com.mapbox.services.android.navigation.ui.v5.NavigationLauncher;
+import com.mapbox.services.android.navigation.ui.v5.NavigationLauncherOptions;
 import com.mapbox.services.android.navigation.ui.v5.route.NavigationMapRoute;
 import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute;
 
@@ -47,7 +53,7 @@ import retrofit2.Response;
  * Fragment example based on the Support Fragment code from the mapbox library.
  */
 public class MapboxMapFragment extends Fragment
-        implements OnMapReadyCallback, MapboxMap.OnMapClickListener, LocationEngineListener, View.OnLongClickListener {
+        implements OnMapReadyCallback, MapboxMap.OnMapClickListener, LocationEngineListener, MapboxMap.OnMapLongClickListener {
 
     FragmentActivity listener;
 
@@ -88,6 +94,7 @@ public class MapboxMapFragment extends Fragment
         return mapFragment;
     }
 
+
     /**
      * creates a listener for the fragment
      * @param context the attached activity context
@@ -95,10 +102,6 @@ public class MapboxMapFragment extends Fragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof Activity){
-            this.listener = (FragmentActivity) context;
-            longListener = (View.OnLongClickListener) context;
-        }
 
     }
 
@@ -144,6 +147,7 @@ public class MapboxMapFragment extends Fragment
         
         enableLocation();
         map.addOnMapClickListener(this);
+        map.addOnMapLongClickListener(this);
 
     }
 
@@ -196,7 +200,7 @@ public class MapboxMapFragment extends Fragment
      *
      * @param location The GPS point to center the map on.
      */
-    private void setCameraPosition (Location location){
+    public void setCameraPosition (Location location){
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
                 location.getLongitude()), 13.0
         ));
@@ -285,7 +289,7 @@ public class MapboxMapFragment extends Fragment
     @Override
     public void onMapClick(@NonNull LatLng point) {
 
-        Log.i(T, "Detectou o ckick");
+        Log.i(T, "Detectou o click");
         if (destinationMarker != null) {
             Log.i(T, "Removeu Marcador Anterior");
             map.removeMarker(destinationMarker);
@@ -387,11 +391,35 @@ public class MapboxMapFragment extends Fragment
         locationLayerPlugin.setLocationLayerEnabled(true);
     }
 
+
     @Override
-    public boolean onLongClick(View view) {
+    public void onMapLongClick(@NonNull LatLng point) {
 
-        Log.i(T, "Long click Detected");
-
-        return false;
+        if(currentRoute != null) {
+            ((Main) getActivity()).longClick();
+            Log.i(T, "Long Click");
+        }
     }
+
+    public void flyButton(){
+        if(originLocation!=null){
+            setCameraPosition(originLocation);
+        }else{
+            CharSequence text = "À espera de GPS";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(getActivity().getApplicationContext(), text, duration);
+            TextView vt = toast.getView().findViewById(android.R.id.message);
+            vt.setTextColor(Color.WHITE);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+    }
+
+    public void navigateButton(){
+
+        NavigationLauncherOptions options = NavigationLauncherOptions.builder().directionsRoute(currentRoute).shouldSimulateRoute(true).build();
+        NavigationLauncher.startNavigation(getActivity(), options);
+    }
+
+
 }
