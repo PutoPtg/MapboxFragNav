@@ -9,20 +9,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 
 import java.util.List;
 
 /**
  * An example full-screen activity with a mapbox map
+ * 
  */
 public class Main extends AppCompatActivity implements PermissionsListener {
 
@@ -36,6 +35,11 @@ public class Main extends AppCompatActivity implements PermissionsListener {
     private int navigate_var;
     private MapboxMapFragment mapFragment;
 
+    /**
+     * Main method called when the activity is creates
+     *
+     * @param savedInstanceState bundle
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,17 +92,34 @@ public class Main extends AppCompatActivity implements PermissionsListener {
         }
     }
 
+    /**
+     * Called when the activity is ready
+     *
+     * @param savedInstanceState Receives a bundle
+     */
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
     }
 
+    /**
+     * Handles the permissions for the user
+     *
+     * @param requestCode   code for the authorization
+     * @param permissions   string with the permissions
+     * @param grantResults  results of the permissions
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
     }
 
+    /**
+     * Message for the user about the permissions
+     *
+     * @param permissionsToExplain  List
+     */
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
 
@@ -106,6 +127,10 @@ public class Main extends AppCompatActivity implements PermissionsListener {
 
     }
 
+    /**
+     * Results of the permissions, recreates the activity
+     * @param granted
+     */
     @Override
     public void onPermissionResult(boolean granted) {
         if(granted){
@@ -113,8 +138,11 @@ public class Main extends AppCompatActivity implements PermissionsListener {
         }
     }
 
+    /**
+     * Handles the long click
+     *
+     */
     public void longClick(){
-
         if (navigate_var == 0){
             Navigate.setVisibility(View.VISIBLE);
 
@@ -125,11 +153,9 @@ public class Main extends AppCompatActivity implements PermissionsListener {
 
             navigate_var = 1;
         }else{
-            FlyToSource.setVisibility(View.GONE);
+            Navigate.setVisibility(View.GONE);
             navigate_var = 0;
         }
-
-
         Log.i(T,"Good Communication");
     }
 

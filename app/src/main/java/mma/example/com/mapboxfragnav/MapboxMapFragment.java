@@ -220,8 +220,10 @@ public class MapboxMapFragment extends Fragment
      */
     @Override
     public void onResume() {
+
         super.onResume();
         mapView.onResume();
+
     }
 
     /**
@@ -267,13 +269,43 @@ public class MapboxMapFragment extends Fragment
      */
     @Override
     public void onDestroyView() {
+
+        /**
+         * TODO: adequate sensor callings
+         */
+
         super.onDestroyView();
         mapView.onDestroy();
         mapReadyCallbackList.clear();
     }
 
+
+    /**
+     * Called when fragment is destroyed
+     *
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(locationEngine != null){
+            locationEngine.deactivate();
+        }
+        Log.i(T, "On Destroy");
+        if(destinationMarker!=null){
+            map.removeMarker(destinationMarker);
+        }
+        if(mapView != null){
+            mapView.onDestroy();
+        }
+        if(navigationMapRoute != null){
+            navigationMapRoute.removeRoute();
+        }
+    }
+
+
     /**
      * Called when the fragment os no longer conneted to the activity.
+     *
      */
     @Override
     public void onDetach() {
@@ -363,6 +395,7 @@ public class MapboxMapFragment extends Fragment
 
     /**
      * Connect function callback.
+     *
      */
     @Override
     public void onConnected() {
@@ -385,6 +418,7 @@ public class MapboxMapFragment extends Fragment
 
     /**
      * Location layer initializer.
+     *
      */
     private void initializeLocationLayer(){
         locationLayerPlugin = new LocationLayerPlugin(mapView, map, locationEngine);
@@ -392,6 +426,11 @@ public class MapboxMapFragment extends Fragment
     }
 
 
+    /**
+     * To detect the long click to show the button.
+     *
+     * @param point     It is obligatory but not used.
+     */
     @Override
     public void onMapLongClick(@NonNull LatLng point) {
 
@@ -401,6 +440,10 @@ public class MapboxMapFragment extends Fragment
         }
     }
 
+    /**
+     * Button to go to the user position
+     *
+     */
     public void flyButton(){
         if(originLocation!=null){
             setCameraPosition(originLocation);
@@ -415,6 +458,10 @@ public class MapboxMapFragment extends Fragment
         }
     }
 
+    /**
+     * Button to start the navigation
+     *
+     */
     public void navigateButton(){
 
         NavigationLauncherOptions options = NavigationLauncherOptions.builder().directionsRoute(currentRoute).shouldSimulateRoute(true).build();
