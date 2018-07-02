@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  * An example full-screen activity with a mapbox map
- * 
+ *
  */
 public class Main extends AppCompatActivity implements PermissionsListener {
 
